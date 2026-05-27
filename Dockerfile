@@ -55,7 +55,7 @@ ENV PORT=10000
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# Start the application. Migrations/seeds are optional and may be handled in deploy settings.
-CMD php artisan migrate --force || true && \
-    php artisan db:seed --force --no-interaction || true && \
+# Start the application and ensure admin seed runs.
+CMD php artisan migrate --force && \
+    php artisan db:seed --class=AdminUserSeeder --force --no-interaction && \
     php artisan serve --host=0.0.0.0 --port=${PORT}
