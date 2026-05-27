@@ -42,7 +42,7 @@ class AdminUserSeeder extends Seeder
 
         Degree::updateOrCreate(
             ['name' => 'BSIT'],
-            ['description' => 'Bachelor of Science in Information Technology']
+            []
         );
     }
 }
