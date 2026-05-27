@@ -52,7 +52,8 @@ RUN php artisan key:generate --force || true
 RUN composer dump-autoload --optimize --no-interaction
 
 # Install Node dependencies and build frontend assets
-RUN npm install && npm run build
+# Use --legacy-peer-deps to bypass Vite/@tailwindcss/vite peer dependency conflicts
+RUN npm install --legacy-peer-deps && npm run build
 
 # Cache configuration for faster startup
 RUN php artisan config:cache && php artisan route:cache
