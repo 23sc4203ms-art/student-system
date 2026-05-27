@@ -145,6 +145,7 @@
             <ul>
                 <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="{{ route('students') }}" class="{{ request()->routeIs('students') || request()->routeIs('students.*') ? 'active' : '' }}"><i class="fas fa-users"></i> Students</a></li>
+                <li><a href="{{ route('degrees.index') }}" class="{{ request()->routeIs('degrees.*') ? 'active' : '' }}"><i class="fas fa-graduation-cap"></i> Degrees</a></li>
                 <li><a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') || request()->routeIs('enrollment.*') ? 'active' : '' }}"><i class="fas fa-book"></i> Courses</a></li>
                 <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}"><i class="fas fa-users-cog"></i> Users</a></li>
                 <li><a href="{{ route('posts.index') }}" class="{{ request()->routeIs('posts.*') ? 'active' : '' }}"><i class="fas fa-file-alt"></i> Posts</a></li>
