@@ -10,10 +10,6 @@ use App\Models\Teacher;
 use App\Models\Degree;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Hash;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\StudentsExport;
-use App\Exports\TeachersExport;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class TeacherController extends Controller
 {
@@ -427,7 +423,39 @@ class TeacherController extends Controller
     public function exportStudentsExcel()
     {
         $this->ensureTeacher();
-        return Excel::download(new StudentsExport, 'students.xlsx');
+        $students = Student::with('UserAccount', 'degree')->orderBy('Lname')->get();
+
+        $spreadsheetClass = 'PhpOffice\\PhpSpreadsheet\\Spreadsheet';
+        $writerClass = 'PhpOffice\\PhpSpreadsheet\\Writer\\Xlsx';
+
+        $spreadsheet = new $spreadsheetClass();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $rows = [];
+        $rows[] = ['ID', 'Username', 'Email', 'First Name', 'Middle Name', 'Last Name', 'Degree', 'Contact', 'Created At'];
+
+        foreach ($students as $s) {
+            $rows[] = [
+                $s->id,
+                optional($s->UserAccount)->username,
+                $s->Email,
+                $s->Fname,
+                $s->Mname,
+                $s->Lname,
+                optional($s->degree)->name,
+                $s->Contactno,
+                $s->created_at ? $s->created_at->toDateTimeString() : null,
+            ];
+        }
+
+        $sheet->fromArray($rows, null, 'A1', true);
+        $writer = new $writerClass($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, 'students.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 
     /**
@@ -437,7 +465,8 @@ class TeacherController extends Controller
     {
         $this->ensureTeacher();
         $students = Student::with('UserAccount', 'degree')->get();
-        $pdf = Pdf::loadView('teacher.exports.students_pdf', compact('students'));
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('teacher.exports.students_pdf', compact('students'));
         return $pdf->download('students.pdf');
     }
 
@@ -447,7 +476,34 @@ class TeacherController extends Controller
     public function exportTeachersExcel()
     {
         $this->ensureTeacher();
-        return Excel::download(new TeachersExport, 'teachers.xlsx');
+        $teachers = UserAccount::where('Role', 'teacher')->orderBy('username')->get();
+
+        $spreadsheetClass = 'PhpOffice\\PhpSpreadsheet\\Spreadsheet';
+        $writerClass = 'PhpOffice\\PhpSpreadsheet\\Writer\\Xlsx';
+
+        $spreadsheet = new $spreadsheetClass();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $rows = [];
+        $rows[] = ['ID', 'Username', 'Email', 'Created At'];
+
+        foreach ($teachers as $t) {
+            $rows[] = [
+                $t->id,
+                $t->username,
+                $t->email,
+                $t->created_at ? $t->created_at->toDateTimeString() : null,
+            ];
+        }
+
+        $sheet->fromArray($rows, null, 'A1', true);
+        $writer = new $writerClass($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, 'teachers.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
     }
 
     /**
@@ -457,7 +513,8 @@ class TeacherController extends Controller
     {
         $this->ensureTeacher();
         $teachers = UserAccount::where('Role', 'teacher')->get();
-        $pdf = Pdf::loadView('teacher.exports.teachers_pdf', compact('teachers'));
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('teacher.exports.teachers_pdf', compact('teachers'));
         return $pdf->download('teachers.pdf');
     }
 
