@@ -152,17 +152,17 @@
                 <li><a href="{{ route('activity-logs.index') }}" class="{{ request()->routeIs('activity-logs.*') ? 'active' : '' }}"><i class="fas fa-history"></i> Activity Logs</a></li>
                 <li><a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}"><i class="fas fa-info-circle"></i> About</a></li>
                 @auth
-                    @php $role = auth()->user()->Role ?? 'student'; @endphp
-                    @if(in_array($role, ['admin','teacher']))
+                    @php $role = strtolower(auth()->user()->Role ?? 'student'); @endphp
+                    @if($role === 'teacher')
                         <li><a href="{{ route('teacher.export.students.excel') }}"><i class="fas fa-file-excel"></i> Export Excel</a></li>
                         <li><a href="{{ route('teacher.export.students.pdf') }}"><i class="fas fa-file-pdf"></i> Export PDF</a></li>
+                    @endif
                         <li>
                             <form method="POST" action="{{ route('logout') }}" style="display:inline">
                                 @csrf
                                 <button type="submit" class="btn btn-link p-0 m-0 align-baseline" style="color: #e2e8f0; font-weight:700; font-size:0.93rem; border: none; background: transparent; cursor: pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
                             </form>
                         </li>
-                    @endif
                 @endauth
             </ul>
         </nav>
