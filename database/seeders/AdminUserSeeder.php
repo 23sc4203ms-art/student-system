@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\UserAccount;
 use App\Models\Teacher;
+use App\Models\Student;
 use App\Models\Degree;
 use Illuminate\Support\Facades\Hash;
 
@@ -25,7 +26,7 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        $teacher = UserAccount::updateOrCreate(
+        $teacherAccount = UserAccount::updateOrCreate(
             ['username' => 'teacher1'],
             [
                 'email' => 'teacher1@example.com',
@@ -36,13 +37,36 @@ class AdminUserSeeder extends Seeder
         );
 
         Teacher::updateOrCreate(
-            ['user_account_id' => $teacher->id],
+            ['user_account_id' => $teacherAccount->id],
             []
         );
 
-        Degree::updateOrCreate(
+        $degree = Degree::updateOrCreate(
             ['name' => 'BSIT'],
             []
+        );
+
+        $studentAccount = UserAccount::updateOrCreate(
+            ['username' => 'student1'],
+            [
+                'email' => 'student1@example.com',
+                'Password' => Hash::make('12345678'),
+                'Role' => 'student',
+                'is_active' => 1,
+            ]
+        );
+
+        Student::updateOrCreate(
+            ['user_account_id' => $studentAccount->id],
+            [
+                'Fname' => 'Juan',
+                'Mname' => 'S',
+                'Lname' => 'Dela Cruz',
+                'Address' => 'Railway Seed',
+                'Email' => 'student1@example.com',
+                'Contactno' => '09123456789',
+                'degree_id' => $degree->id,
+            ]
         );
     }
 }
