@@ -10,8 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE posts MODIFY created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP');
-        DB::statement('ALTER TABLE posts MODIFY updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE posts MODIFY created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP');
+            DB::statement('ALTER TABLE posts MODIFY updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
+        }
     }
 
     /**
@@ -19,7 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE posts MODIFY created_at TIMESTAMP NULL DEFAULT NULL');
-        DB::statement('ALTER TABLE posts MODIFY updated_at TIMESTAMP NULL DEFAULT NULL');
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE posts MODIFY created_at TIMESTAMP NULL DEFAULT NULL');
+            DB::statement('ALTER TABLE posts MODIFY updated_at TIMESTAMP NULL DEFAULT NULL');
+        }
     }
 };
