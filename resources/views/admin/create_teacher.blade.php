@@ -1,42 +1,55 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Create Teacher</title>
-</head>
-<body>
-    <h1>Create Teacher</h1>
-    @if($errors->any())
-        <div style="color:red">
-            <ul>
-                @foreach($errors->all() as $e)
-                    <li>{{ $e }}</li>
-                @endforeach
-            </ul>
+@extends('format.layout')
+
+@section('title', 'Create Teacher')
+
+@section('content')
+    <div class="container" style="max-width: 680px;">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3">Create Teacher</h1>
+                        <p class="text-muted mb-0">Add a new teacher account for your school.</p>
+                    </div>
+                    <a href="{{ route('admin.index') }}" class="btn btn-outline-secondary btn-sm">Back</a>
+                </div>
+
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.teachers.store') }}">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" value="{{ old('username') }}" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" value="{{ old('email') }}" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Teacher</button>
+                </form>
+            </div>
         </div>
-    @endif
-    <form method="post" action="{{ route('admin.teachers.store') }}">
-        @csrf
-        <div>
-            <label>Username</label>
-            <input name="username" value="{{ old('username') }}" required />
-        </div>
-        <div>
-            <label>Email</label>
-            <input name="email" value="{{ old('email') }}" required />
-        </div>
-        <div>
-            <label>Password</label>
-            <input type="password" name="password" required />
-        </div>
-        <div>
-            <label>Confirm Password</label>
-            <input type="password" name="password_confirmation" required />
-        </div>
-        <div>
-            <button type="submit">Create Teacher</button>
-        </div>
-    </form>
-    <p><a href="{{ route('admin.index') }}">Back</a></p>
-</body>
-</html>
+    </div>
+@endsection
