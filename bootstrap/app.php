@@ -26,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         ]);
+        
+        // Trust proxies for reverse proxy setups (Render, cloud platforms)
+        $middleware->trustProxies(at: '*');
 
     })
     ->withExceptions(function (Exceptions $exceptions): void {

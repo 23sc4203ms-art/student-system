@@ -47,15 +47,16 @@ RUN npm install && npm run build
 RUN mkdir -p storage/framework/{sessions,views,cache} \
     && mkdir -p bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data /var/www
 
-EXPOSE 10000
+EXPOSE 8000
 
-ENV PORT=10000
+ENV PORT=8000
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# Start the application and ensure admin seed runs.
+# Start the application with proper production setup
 CMD php artisan migrate --force && \
     php artisan db:seed --class=AdminUserSeeder --force --no-interaction && \
-    php artisan serve --host=0.0.0.0 --port=${PORT}
+    php -S 0.0.0.0:${PORT} -t public/
