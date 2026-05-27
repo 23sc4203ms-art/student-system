@@ -41,14 +41,15 @@ COPY . .
 RUN if [ ! -f .env ]; then cp .env.example .env || echo "APP_KEY=" > .env; fi
 
 # Install PHP dependencies with environment variables set
-ENV LARAVEL_SKIP_AUTOLOAD_DUMP=true
-RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --no-progress
+# The key flag is --no-scripts. This prevents Composer from running @php artisan package:discover,
+# which is the source of the error.
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --prefer-dist --no-progress
 
 # Generate APP_KEY if not set
 RUN php artisan key:generate --force || true
+
 # Run scripts after environment is ready
 RUN composer dump-autoload --optimize --no-interaction
-
 
 # Install Node dependencies and build frontend assets
 RUN npm install && npm run build
