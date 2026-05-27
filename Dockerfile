@@ -41,7 +41,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
 
 # Install Node dependencies and build frontend assets
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 # Create necessary directories and set permissions
 RUN mkdir -p storage/framework/{sessions,views,cache} \
