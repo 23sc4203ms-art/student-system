@@ -21,7 +21,9 @@ class TeacherController extends Controller
     private function ensureTeacher()
     {
         $user = Auth::user();
-        if (($user->Role ?? 'teacher') !== 'teacher') {
+        $role = strtolower((string) ($user->Role ?? ''));
+
+        if (!in_array($role, ['teacher', 'admin'], true)) {
             abort(403, 'Unauthorized');
         }
     }

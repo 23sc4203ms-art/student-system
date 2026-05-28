@@ -29,12 +29,10 @@ class UserController extends Controller
         $redirectUrl = route('students');
 
         if ($user) {
-            $role = $user->Role ?? 'student';
+            $role = strtolower((string) ($user->Role ?? 'student'));
 
-            if ($role === 'admin') {
-                $redirectUrl = route('admin.index');
-            } elseif ($role === 'teacher') {
-                $redirectUrl = route('teacher.dashboard');
+            if (in_array($role, ['admin', 'teacher'], true)) {
+                $redirectUrl = route('teacher.management');
             } else {
                 $redirectUrl = route('student.dashboard');
             }
@@ -97,11 +95,9 @@ class UserController extends Controller
         Auth::loginUsingId($user->id, $remember);
 
         // Redirect based on role
-        $role = $user->Role ?? 'student';
-        if ($role === 'admin') {
-            return redirect()->route('admin.index');
-        } elseif ($role === 'teacher') {
-            return redirect()->route('teacher.dashboard');
+        $role = strtolower((string) ($user->Role ?? 'student'));
+        if (in_array($role, ['admin', 'teacher'], true)) {
+            return redirect()->route('teacher.management');
         } else {
             // For students: only force change-password if account still has a temp password flag
             $isTemp = (bool) ($user->is_temp_password ?? false);
