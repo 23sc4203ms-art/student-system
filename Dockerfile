@@ -37,16 +37,10 @@ WORKDIR /var/www
 # Copy application files
 COPY . .
 
-# Create .env file from .env.example for build time
-RUN if [ ! -f .env ]; then cp .env.example .env || echo "APP_KEY=" > .env; fi
-
 # Install PHP dependencies with environment variables set
 # The key flag is --no-scripts. This prevents Composer from running @php artisan package:discover,
 # which is the source of the error.
 RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --prefer-dist --no-progress
-
-# Generate APP_KEY if not set
-RUN php artisan key:generate --force || true
 
 # Run scripts after environment is ready
 RUN composer dump-autoload --optimize --no-interaction
@@ -54,9 +48,6 @@ RUN composer dump-autoload --optimize --no-interaction
 # Install Node dependencies and build frontend assets
 # Use --legacy-peer-deps to bypass Vite/@tailwindcss/vite peer dependency conflicts
 RUN npm install --legacy-peer-deps && npm run build
-
-# Cache configuration for faster startup
-RUN php artisan config:cache && php artisan route:cache
 
 # Create necessary directories and set permissions
 RUN mkdir -p storage/framework/{sessions,views,cache} \
@@ -72,6 +63,10 @@ ENV APP_ENV=production
 ENV APP_DEBUG=false
 
 # Start the application with proper production setup
-CMD php artisan migrate --force && \
+CMD php artisan config:clear && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan migrate --force && \
     php artisan db:seed --class=AdminUserSeeder --force --no-interaction && \
     php -S 0.0.0.0:${PORT} -t public/
